@@ -12,8 +12,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MyAppStateCurrent()),
+        ChangeNotifierProvider(create: (_) => MyAppStateFavorites()),
+      ],
       child: MaterialApp.router(
         title: 'Namer App',
         theme: ThemeData(
@@ -50,8 +53,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  MyAppState() {
+class MyAppStateCurrent extends ChangeNotifier {
+  MyAppStateCurrent() {
     () async {
       while (true) {
         await Future.delayed(const Duration(seconds: 3));
@@ -66,14 +69,16 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+}
 
+class MyAppStateFavorites extends ChangeNotifier {
   var favorites = <WordPair>[];
 
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
+  void toggleFavorite(WordPair word) {
+    if (favorites.contains(word)) {
+      favorites.remove(word);
     } else {
-      favorites.add(current);
+      favorites.add(word);
     }
     notifyListeners();
   }
@@ -135,11 +140,12 @@ class GeneratorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint("REBUILDING GeneratorPage ${DateTime.now().toString()}");
 
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+    var appStateC = context.watch<MyAppStateCurrent>();
+    var appStateF = context.watch<MyAppStateFavorites>();
+    var pair = appStateC.current;
 
     IconData icon;
-    if (appState.favorites.contains(pair)) {
+    if (appStateF.favorites.contains(pair)) {
       icon = Icons.favorite;
     } else {
       icon = Icons.favorite_border;
@@ -156,7 +162,7 @@ class GeneratorPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  appState.toggleFavorite();
+                  appStateF.toggleFavorite(pair);
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
@@ -208,7 +214,7 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint("REBUILDING FavoritesPage ${DateTime.now().toString()}");
 
-    var appState = context.watch<MyAppState>();
+    var appState = context.watch<MyAppStateFavorites>();
 
     if (appState.favorites.isEmpty) {
       return Center(
