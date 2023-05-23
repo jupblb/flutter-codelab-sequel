@@ -25,11 +25,11 @@ class MyApp extends StatelessWidget {
           routes: [
             GoRoute(
               path: '/generator',
-              builder: (context, state) => const MyHomePage(0),
+              builder: (context, state) => MyHomePage(0, GeneratorPage()),
             ),
             GoRoute(
               path: '/favorites',
-              builder: (context, state) => const MyHomePage(1),
+              builder: (context, state) => MyHomePage(1, FavoritesPage()),
             ),
           ],
         ),
@@ -60,23 +60,12 @@ class MyAppState extends ChangeNotifier {
 
 class MyHomePage extends StatelessWidget {
   final int selectedIndex;
+  final Widget child;
 
-  const MyHomePage(this.selectedIndex, {super.key});
+  const MyHomePage(this.selectedIndex, this.child, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = GeneratorPage();
-        break;
-      case 1:
-        page = FavoritesPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
-
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
         body: Row(
@@ -96,14 +85,21 @@ class MyHomePage extends StatelessWidget {
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
-                  context.go(selectedIndex == 1 ? '/generator' : '/favorites');
+                  switch (value) {
+                    case 0:
+                      context.go('/generator');
+                      break;
+                    case 1:
+                      context.go('/favorites');
+                      break;
+                  }
                 },
               ),
             ),
             Expanded(
               child: Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                child: page,
+                child: child,
               ),
             ),
           ],
