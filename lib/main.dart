@@ -1,5 +1,6 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -13,13 +14,25 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
-        home: MyHomePage(),
+        routerConfig: GoRouter(
+          initialLocation: '/generator',
+          routes: [
+            GoRoute(
+              path: '/generator',
+              builder: (context, state) => const MyHomePage(0),
+            ),
+            GoRoute(
+              path: '/favorites',
+              builder: (context, state) => const MyHomePage(1),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -45,13 +58,10 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+class MyHomePage extends StatelessWidget {
+  final int selectedIndex;
 
-class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;
+  const MyHomePage(this.selectedIndex, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -86,9 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                  });
+                  context.go(selectedIndex == 1 ? '/generator' : '/favorites');
                 },
               ),
             ),
