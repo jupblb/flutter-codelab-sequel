@@ -51,6 +51,15 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
+  MyAppState() {
+    () async {
+      while (true) {
+        await Future.delayed(const Duration(seconds: 3));
+        getNext();
+      }
+    }();
+  }
+
   var current = WordPair.random();
 
   void getNext() {
@@ -124,6 +133,8 @@ class MyHomePage extends StatelessWidget {
 class GeneratorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    debugPrint("REBUILDING GeneratorPage ${DateTime.now().toString()}");
+
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
@@ -152,9 +163,7 @@ class GeneratorPage extends StatelessWidget {
               ),
               SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
+                onPressed: null,
                 child: Text('Next'),
               ),
             ],
@@ -197,6 +206,8 @@ class BigCard extends StatelessWidget {
 class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    debugPrint("REBUILDING FavoritesPage ${DateTime.now().toString()}");
+
     var appState = context.watch<MyAppState>();
 
     if (appState.favorites.isEmpty) {
