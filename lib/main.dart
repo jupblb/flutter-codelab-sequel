@@ -25,15 +25,27 @@ class MyApp extends StatelessWidget {
           routes: [
             GoRoute(
               path: '/generator',
-              builder: (context, state) => MyHomePage(0, GeneratorPage()),
+              pageBuilder: (context, state) =>
+                  _transition(context, state, MyHomePage(0, GeneratorPage())),
             ),
             GoRoute(
               path: '/favorites',
-              builder: (context, state) => MyHomePage(1, FavoritesPage()),
+              pageBuilder: (context, state) =>
+                  _transition(context, state, MyHomePage(1, FavoritesPage())),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Page<dynamic> _transition(
+      BuildContext context, GoRouterState state, Widget child) {
+    return CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, _, child) =>
+          FadeTransition(opacity: animation, child: child),
     );
   }
 }
